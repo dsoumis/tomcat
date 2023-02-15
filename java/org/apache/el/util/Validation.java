@@ -19,7 +19,7 @@ package org.apache.el.util;
 public class Validation {
 
     // Java keywords, boolean literals & the null literal in alphabetical order
-    private static final String invalidIdentifiers[] = { "abstract", "assert",
+    private static final String[] invalidIdentifiers = { "abstract", "assert",
         "boolean", "break", "byte", "case", "catch", "char", "class", "const",
         "continue", "default", "do", "double", "else", "enum", "extends",
         "false", "final", "finally", "float", "for", "goto", "if", "implements",

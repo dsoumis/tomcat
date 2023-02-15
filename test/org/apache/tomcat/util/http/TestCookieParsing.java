@@ -197,7 +197,7 @@ public class TestCookieParsing extends TomcatBaseTest {
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
-            Cookie cookies[] = req.getCookies();
+            Cookie[] cookies = req.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
                     resp.getWriter().write(cookie.getName() + "=" +

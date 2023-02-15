@@ -1021,7 +1021,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         stream.writeObject(notes.get(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE));
 
         // Accumulate the names of serializable and non-serializable attributes
-        String keys[] = keys();
+        String[] keys = keys();
         List<String> saveNames = new ArrayList<>();
         List<Object> saveValues = new ArrayList<>();
         for (String key : keys) {

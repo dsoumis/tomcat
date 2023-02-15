@@ -93,7 +93,7 @@ public final class Response {
     /**
      * Notes.
      */
-    final Object notes[] = new Object[Constants.MAX_NOTES];
+    final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**

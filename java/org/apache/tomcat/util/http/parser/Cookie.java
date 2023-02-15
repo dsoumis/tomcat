@@ -49,8 +49,8 @@ public class Cookie {
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http.parser");
 
-    private static final boolean isCookieOctet[] = new boolean[256];
-    private static final boolean isText[] = new boolean[256];
+    private static final boolean[] isCookieOctet = new boolean[256];
+    private static final boolean[] isText = new boolean[256];
     private static final byte[] EMPTY_BYTES = new byte[0];
     private static final byte TAB_BYTE = (byte) 0x09;
     private static final byte SPACE_BYTE = (byte) 0x20;

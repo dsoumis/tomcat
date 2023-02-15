@@ -606,7 +606,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public static class NonceInfo {
         private final long timestamp;
-        private final boolean seen[];
+        private final boolean[] seen;
         private final int offset;
         private int count = 0;
 

@@ -156,8 +156,8 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
         if (args == null) {
             result = jmxServerConnection.invoke(new ObjectName(name), operation, null, null);
         } else {
-            Object argsA[]=new Object[ args.size()];
-            String sigA[]=new String[args.size()];
+            Object[] argsA =new Object[ args.size()];
+            String[] sigA =new String[args.size()];
             for( int i=0; i<args.size(); i++ ) {
                 Arg arg=args.get(i);
                 if (arg.getType() == null) {

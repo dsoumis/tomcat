@@ -126,7 +126,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationEventListeners(Object listeners[]);
+    void setApplicationEventListeners(Object[] listeners);
 
 
     /**
@@ -146,7 +146,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationLifecycleListeners(Object listeners[]);
+    void setApplicationLifecycleListeners(Object[] listeners);
 
 
     /**

@@ -136,7 +136,7 @@ public interface Realm extends Contained {
      *  the array being the certificate of the client itself.
      * @return the associated principal, or <code>null</code> if there is none
      */
-    Principal authenticate(X509Certificate certs[]);
+    Principal authenticate(X509Certificate[] certs);
 
 
     /**

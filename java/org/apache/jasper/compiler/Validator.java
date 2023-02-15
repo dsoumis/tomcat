@@ -1693,9 +1693,9 @@ class Validator {
                                 .getPrefix()
                                 + ':' + n.getName(), e.getMessage());
                     }
-                    String paramTypes[] = n.getParameters();
+                    String[] paramTypes = n.getParameters();
                     int size = paramTypes.length;
-                    Class<?> params[] = new Class[size];
+                    Class<?>[] params = new Class[size];
                     int i = 0;
                     try {
                         for (i = 0; i < size; i++) {

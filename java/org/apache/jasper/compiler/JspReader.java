@@ -111,7 +111,7 @@ class JspReader {
 
         try {
             CharArrayWriter caw = new CharArrayWriter();
-            char buf[] = new char[1024];
+            char[] buf = new char[1024];
             for (int i = 0 ; (i = reader.read(buf)) != -1 ;) {
                 caw.write(buf, 0, i);
             }

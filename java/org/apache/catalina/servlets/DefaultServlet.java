@@ -2012,7 +2012,7 @@ public class DefaultServlet extends HttpServlet {
                     log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
                 } else {
                     try (FileInputStream fis = new FileInputStream(f)){
-                        byte b[] = new byte[(int)f.length()];
+                        byte[] b = new byte[(int)f.length()];
                         IOTools.readFully(fis, b);
                         return new StreamSource(new ByteArrayInputStream(b));
                     }
@@ -2461,7 +2461,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Copy the input stream to the output stream
         IOException exception = null;
-        byte buffer[] = new byte[input];
+        byte[] buffer = new byte[input];
         int len = buffer.length;
         while (true) {
             try {
@@ -2494,7 +2494,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Copy the input stream to the output stream
         IOException exception = null;
-        char buffer[] = new char[input];
+        char[] buffer = new char[input];
         int len = buffer.length;
         while (true) {
             try {
@@ -2547,7 +2547,7 @@ public class DefaultServlet extends HttpServlet {
         IOException exception = null;
         long bytesToRead = end - start + 1;
 
-        byte buffer[] = new byte[input];
+        byte[] buffer = new byte[input];
         int len = buffer.length;
         while ( (bytesToRead > 0) && (len >= buffer.length)) {
             try {

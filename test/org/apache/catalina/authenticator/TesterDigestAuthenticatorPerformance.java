@@ -65,8 +65,8 @@ public class TesterDigestAuthenticatorPerformance {
 
     public void doTest(int threadCount, int requestCount) throws Exception {
 
-        TesterRunnable runnables[] = new TesterRunnable[threadCount];
-        Thread threads[] = new Thread[threadCount];
+        TesterRunnable[] runnables = new TesterRunnable[threadCount];
+        Thread[] threads = new Thread[threadCount];
 
         String nonce = authenticator.generateNonce(new TesterDigestRequest());
 

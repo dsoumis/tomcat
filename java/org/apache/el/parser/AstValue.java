@@ -346,7 +346,7 @@ public final class AstValue extends SimpleNode {
             return null;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;

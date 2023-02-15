@@ -138,7 +138,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void write(char buf[], int off, int len) {
+    public void write(char[] buf, int off, int len) {
 
         if (error) {
             return;
@@ -154,7 +154,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void write(char buf[]) {
+    public void write(char[] buf) {
         write(buf, 0, buf.length);
     }
 
@@ -225,7 +225,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void print(char s[]) {
+    public void print(char[] s) {
         write(s);
     }
 
@@ -294,7 +294,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void println(char c[]) {
+    public void println(char[] c) {
         print(c);
         println();
     }

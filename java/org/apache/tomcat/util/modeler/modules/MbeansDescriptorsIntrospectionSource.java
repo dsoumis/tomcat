@@ -385,7 +385,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         if (name == null || name.length() == 0) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

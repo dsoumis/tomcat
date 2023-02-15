@@ -243,7 +243,7 @@ public class XByteBuffer implements Serializable {
 
     public void expand(int newcount) {
         //don't change the allocation strategy
-        byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
+        byte[] newbuf = new byte[Math.max(buf.length << 1, newcount)];
         System.arraycopy(buf, 0, newbuf, 0, bufSize);
         buf = newbuf;
     }

@@ -213,7 +213,7 @@ public class StandardContextSF extends StoreFactoryBase {
         if (aContext instanceof StandardContext) {
             StandardContext context = (StandardContext) aContext;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = context.findLifecycleListeners();
+            LifecycleListener[] listeners = context.findLifecycleListeners();
             List<LifecycleListener> listenersArray = new ArrayList<>();
             for (LifecycleListener listener : listeners) {
                 if (!(listener instanceof ThreadLocalLeakPreventionListener)) {
@@ -223,7 +223,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElementArray(aWriter, indent, listenersArray.toArray());
 
             // Store nested <Valve> elements
-            Valve valves[] = context.getPipeline().getValves();
+            Valve[] valves = context.getPipeline().getValves();
             storeElementArray(aWriter, indent, valves);
 
             // Store nested <Loader> elements
@@ -253,11 +253,11 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, resources);
 
             // Store nested <WrapperListener> elements
-            String wLifecycles[] = context.findWrapperLifecycles();
+            String[] wLifecycles = context.findWrapperLifecycles();
             getStoreAppender().printTagArray(aWriter, "WrapperListener",
                     indent + 2, wLifecycles);
             // Store nested <WrapperLifecycle> elements
-            String wListeners[] = context.findWrapperListeners();
+            String[] wListeners = context.findWrapperListeners();
             getStoreAppender().printTagArray(aWriter, "WrapperLifecycle",
                     indent + 2, wListeners);
 

@@ -173,7 +173,7 @@ public class Membership implements Cloneable {
         synchronized (membersLock) {
             if (!map.containsKey(member) ) {
                 map.put(member, entry);
-                Member results[] = new Member[members.length + 1];
+                Member[] results = new Member[members.length + 1];
                 System.arraycopy(members, 0, results, 0, members.length);
                 results[members.length] = member;
                 Arrays.sort(results, memberComparator);
@@ -201,7 +201,7 @@ public class Membership implements Cloneable {
             if (n < 0) {
                 return;
             }
-            Member results[] = new Member[members.length - 1];
+            Member[] results = new Member[members.length - 1];
             int j = 0;
             for (int i = 0; i < members.length; i++) {
                 if (i != n) {

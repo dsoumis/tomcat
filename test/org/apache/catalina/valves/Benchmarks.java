@@ -184,7 +184,7 @@ public class Benchmarks {
     }
 
     private abstract static class TimeDateElementBenchmarkTestBase {
-        protected static final String months[] = { "Jan", "Feb", "Mar", "Apr",
+        protected static final String[] months = { "Jan", "Feb", "Mar", "Apr",
                 "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         protected String lookup(String month) {

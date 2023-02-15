@@ -249,7 +249,7 @@ public class ExpandWar {
 
         boolean result = true;
 
-        String files[] = null;
+        String[] files = null;
         if (src.isDirectory()) {
             files = src.list();
             result = dest.mkdir();
@@ -343,7 +343,7 @@ public class ExpandWar {
      */
     public static boolean deleteDir(File dir, boolean logFailure) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }
@@ -383,7 +383,7 @@ public class ExpandWar {
     private static void expand(InputStream input, File file) throws IOException {
         try (BufferedOutputStream output =
                 new BufferedOutputStream(new FileOutputStream(file))) {
-            byte buffer[] = new byte[2048];
+            byte[] buffer = new byte[2048];
             while (true) {
                 int n = input.read(buffer);
                 if (n <= 0) {

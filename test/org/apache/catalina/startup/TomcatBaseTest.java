@@ -534,7 +534,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                  e.hasMoreElements();) {
                 name = e.nextElement();
                 value = new StringBuilder();
-                String values[] = request.getParameterValues(name);
+                String[] values = request.getParameterValues(name);
                 int m = values.length;
                 for (int j = 0; j < m; j++) {
                     value.append(values[j]);

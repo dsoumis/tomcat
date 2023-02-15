@@ -136,7 +136,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {
         try {
             MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
-            MBeanAttributeInfo attrs[] = minfo.getAttributes();
+            MBeanAttributeInfo[] attrs = minfo.getAttributes();
             Object value = null;
 
             for (MBeanAttributeInfo attr : attrs) {

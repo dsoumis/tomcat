@@ -85,8 +85,8 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                         (item.handback == handback)) {
                         BaseAttributeFilter oldFilter =
                             (BaseAttributeFilter) item.filter;
-                        String newNames[] = newFilter.getNames();
-                        String oldNames[] = oldFilter.getNames();
+                        String[] newNames = newFilter.getNames();
+                        String[] oldNames = oldFilter.getNames();
                         if (newNames.length == 0) {
                             oldFilter.clear();
                         } else {

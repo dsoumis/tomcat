@@ -519,13 +519,13 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             // always put an empty line after the headers
             requestHead.append(CRLF);
 
-            String request[] = new String[2];
+            String[] request = new String[2];
             request[0] = requestHead.toString();
             request[1] = requestTail;
             doRequest(request);
         }
 
-        private void doRequest(String request[]) throws Exception {
+        private void doRequest(String[] request) throws Exception {
             setRequest(request);
             connect();
             processRequest();

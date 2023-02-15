@@ -230,11 +230,11 @@ public final class Parameters {
     private static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
 
 
-    public void processParameters( byte bytes[], int start, int len ) {
+    public void processParameters(byte[] bytes, int start, int len ) {
         processParameters(bytes, start, len, charset);
     }
 
-    private void processParameters(byte bytes[], int start, int len, Charset charset) {
+    private void processParameters(byte[] bytes, int start, int len, Charset charset) {
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("parameters.bytes",

@@ -330,8 +330,8 @@ public class JspRuntimeLibrary {
                 java.beans.BeanInfo info
                 = java.beans.Introspector.getBeanInfo(bean.getClass());
                 if ( info != null ) {
-                    java.beans.PropertyDescriptor pd[]
-                            = info.getPropertyDescriptors();
+                    java.beans.PropertyDescriptor[] pd
+                        = info.getPropertyDescriptors();
                     for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
                         if (propertyDescriptor.getName().equals(prop)) {
                             method = propertyDescriptor.getWriteMethod();
@@ -776,7 +776,7 @@ public class JspRuntimeLibrary {
         if (name == null || name.length() == 0) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }
@@ -787,7 +787,7 @@ public class JspRuntimeLibrary {
         Class<?> type = null;
         if (GRAAL) {
             String setter = "set" + capitalize(prop);
-            Method methods[] = beanClass.getMethods();
+            Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
                 if (setter.equals(method.getName())) {
                     return method;
@@ -796,7 +796,7 @@ public class JspRuntimeLibrary {
         } else {
             try {
                 java.beans.BeanInfo info = java.beans.Introspector.getBeanInfo(beanClass);
-                java.beans.PropertyDescriptor pd[] = info.getPropertyDescriptors();
+                java.beans.PropertyDescriptor[] pd = info.getPropertyDescriptors();
                 for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
                     if (propertyDescriptor.getName().equals(prop)) {
                         result = propertyDescriptor.getWriteMethod();
@@ -827,7 +827,7 @@ public class JspRuntimeLibrary {
         Class<?> type = null;
         if (GRAAL) {
             String setter = "get" + capitalize(prop);
-            Method methods[] = beanClass.getMethods();
+            Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
                 if (setter.equals(method.getName())) {
                     return method;
@@ -836,7 +836,7 @@ public class JspRuntimeLibrary {
         } else {
             try {
                 java.beans.BeanInfo info = java.beans.Introspector.getBeanInfo(beanClass);
-                java.beans.PropertyDescriptor pd[] = info.getPropertyDescriptors();
+                java.beans.PropertyDescriptor[] pd = info.getPropertyDescriptors();
                 for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
                     if (propertyDescriptor.getName().equals(prop)) {
                         result = propertyDescriptor.getReadMethod();

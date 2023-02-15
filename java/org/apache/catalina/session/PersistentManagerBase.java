@@ -342,7 +342,7 @@ public abstract class PersistentManagerBase extends ManagerBase
     public void processExpires() {
 
         long timeNow = System.currentTimeMillis();
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         int expireHere = 0 ;
         if(log.isDebugEnabled()) {
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
@@ -521,7 +521,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
         }
 
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         int n = sessions.length;
         if (n == 0) {
             return;
@@ -761,7 +761,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             unload();
         } else {
             // Expire all active sessions
-            Session sessions[] = findSessions();
+            Session[] sessions = findSessions();
             for (Session value : sessions) {
                 StandardSession session = (StandardSession) value;
                 if (!session.isValid()) {
@@ -792,7 +792,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
         }
 
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
 
         // Swap out all sessions idle longer than maxIdleSwap
         if (maxIdleSwap >= 0) {
@@ -837,7 +837,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
         }
 
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
 
         // FIXME: Smarter algorithm (LRU)
         int limit = (int) (getMaxActiveSessions() * 0.9);
@@ -892,7 +892,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
         }
 
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
 
         // Back up all sessions idle longer than maxIdleBackup
         if (maxIdleBackup >= 0) {

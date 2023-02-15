@@ -632,7 +632,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Create and populate a SavedRequest object for this request
         SavedRequest saved = new SavedRequest();
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 saved.addCookie(cookie);

@@ -115,7 +115,7 @@ public final class Tool {
      * @param args Command line arguments to be processed
      */
     @SuppressWarnings("null")
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         // Verify that "catalina.home" was passed.
         if (catalinaHome == null) {
@@ -205,14 +205,14 @@ public final class Tool {
         }
 
         Method method = null;
-        String params[] = new String[args.length - index];
+        String[] params = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Identifying main() method");
             }
             String methodName = "main";
-            Class<?> paramTypes[] = new Class[1];
+            Class<?>[] paramTypes = new Class[1];
             paramTypes[0] = params.getClass();
             method = clazz.getMethod(methodName, paramTypes);
         } catch (Throwable t) {
@@ -226,7 +226,7 @@ public final class Tool {
             if (log.isDebugEnabled()) {
                 log.debug("Calling main() method");
             }
-            Object paramValues[] = new Object[1];
+            Object[] paramValues = new Object[1];
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {

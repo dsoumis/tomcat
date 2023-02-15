@@ -296,7 +296,7 @@ public final class MessageBytes implements Cloneable, Serializable {
                 //$FALL-THROUGH$
             case T_STR: {
                 type = T_CHARS;
-                char cc[] = strValue.toCharArray();
+                char[] cc = strValue.toCharArray();
                 charC.setChars(cc, 0, cc.length);
             }
         }

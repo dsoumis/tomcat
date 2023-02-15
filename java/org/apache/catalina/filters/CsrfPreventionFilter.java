@@ -61,7 +61,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @param entryPoints Comma separated list of URLs to be configured as entry points.
      */
     public void setEntryPoints(String entryPoints) {
-        String values[] = entryPoints.split(",");
+        String[] values = entryPoints.split(",");
         for (String value : values) {
             this.entryPoints.add(value.trim());
         }

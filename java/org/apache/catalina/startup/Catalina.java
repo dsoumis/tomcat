@@ -316,7 +316,7 @@ public class Catalina {
      * @param args Command line arguments to process
      * @return <code>true</code> if we should continue processing
      */
-    protected boolean arguments(String args[]) {
+    protected boolean arguments(String[] args) {
 
         boolean isConfig = false;
         boolean isGenerateCode = false;
@@ -760,7 +760,7 @@ public class Catalina {
     /*
      * Load using arguments
      */
-    public void load(String args[]) {
+    public void load(String[] args) {
 
         try {
             if (arguments(args)) {

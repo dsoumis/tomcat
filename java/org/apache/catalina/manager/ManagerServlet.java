@@ -572,7 +572,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     protected void sslReload(PrintWriter writer, String tlsHostName, StringManager smClient) {
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         boolean found = false;
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
@@ -1676,7 +1676,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1699,7 +1699,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1748,7 +1748,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();

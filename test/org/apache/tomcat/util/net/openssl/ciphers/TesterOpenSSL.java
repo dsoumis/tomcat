@@ -273,7 +273,7 @@ public class TesterOpenSSL {
         boolean first = true;
 
         // OpenSSL should have returned one cipher per line
-        String ciphers[] = stdout.split("\n");
+        String[] ciphers = stdout.split("\n");
         for (String cipher : ciphers) {
             // Handle rename for 1.1.0 onwards
             cipher = cipher.replace("EDH", "DHE");

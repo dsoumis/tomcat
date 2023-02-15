@@ -137,8 +137,8 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
      */
     protected void jmxCreate(MBeanServerConnection jmxServerConnection,
             String name) throws Exception {
-        Object argsA[] = null;
-        String sigA[] = null;
+        Object[] argsA = null;
+        String[] sigA = null;
         if (args != null) {
             argsA = new Object[ args.size()];
             sigA = new String[args.size()];

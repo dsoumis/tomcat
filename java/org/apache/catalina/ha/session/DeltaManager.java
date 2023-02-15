@@ -747,7 +747,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected Member findSessionMasterMember() {
         Member mbr = null;
-        Member mbrs[] = cluster.getMembers();
+        Member[] mbrs = cluster.getMembers();
         if(mbrs.length != 0 ) {
             mbr = mbrs[0];
         }
@@ -829,7 +829,7 @@ public class DeltaManager extends ClusterManagerBase{
         if (log.isInfoEnabled()) {
             log.info(sm.getString("deltaManager.expireSessions", getName()));
         }
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         for (Session value : sessions) {
             DeltaSession session = (DeltaSession) value;
             if (!session.isValid()) {
@@ -1054,7 +1054,7 @@ public class DeltaManager extends ClusterManagerBase{
     public void expireAllLocalSessions()
     {
         long timeNow = System.currentTimeMillis();
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         int expireDirect  = 0 ;
         int expireIndirect = 0 ;
 

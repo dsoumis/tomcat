@@ -73,7 +73,7 @@ public class ManagedBean implements java.io.Serializable {
     protected String group = null;
     protected String name = null;
 
-    private NotificationInfo notifications[] = new NotificationInfo[0];
+    private NotificationInfo[] notifications = new NotificationInfo[0];
     protected String type = null;
 
     /**
@@ -240,7 +240,7 @@ public class ManagedBean implements java.io.Serializable {
     public void addNotification(NotificationInfo notification) {
         mBeanInfoLock.writeLock().lock();
         try {
-            NotificationInfo results[] =
+            NotificationInfo[] results =
                 new NotificationInfo[notifications.length + 1];
             System.arraycopy(notifications, 0, results, 0,
                              notifications.length);
@@ -360,23 +360,23 @@ public class ManagedBean implements java.io.Serializable {
         try {
             if (info == null) {
                 // Create subordinate information descriptors as required
-                AttributeInfo attrs[] = getAttributes();
-                MBeanAttributeInfo attributes[] =
+                AttributeInfo[] attrs = getAttributes();
+                MBeanAttributeInfo[] attributes =
                     new MBeanAttributeInfo[attrs.length];
                 for (int i = 0; i < attrs.length; i++) {
                     attributes[i] = attrs[i].createAttributeInfo();
                 }
 
-                OperationInfo opers[] = getOperations();
-                MBeanOperationInfo operations[] =
+                OperationInfo[] opers = getOperations();
+                MBeanOperationInfo[] operations =
                     new MBeanOperationInfo[opers.length];
                 for (int i = 0; i < opers.length; i++) {
                     operations[i] = opers[i].createOperationInfo();
                 }
 
 
-                NotificationInfo notifs[] = getNotifications();
-                MBeanNotificationInfo notifications[] =
+                NotificationInfo[] notifs = getNotifications();
+                MBeanNotificationInfo[] notifications =
                     new MBeanNotificationInfo[notifs.length];
                 for (int i = 0; i < notifs.length; i++) {
                     notifications[i] = notifs[i].createNotificationInfo();
@@ -474,7 +474,7 @@ public class ManagedBean implements java.io.Serializable {
         String setMethod = attrInfo.getSetMethod();
         String argType=attrInfo.getType();
 
-        Class<?> signature[] = new Class[] { BaseModelMBean.getAttributeClass( argType ) };
+        Class<?>[] signature = new Class[] { BaseModelMBean.getAttributeClass( argType ) };
 
         Object object = null;
         NoSuchMethodException exception = null;
@@ -528,7 +528,7 @@ public class ManagedBean implements java.io.Serializable {
 
         // Prepare the signature required by Java reflection APIs
         // FIXME - should we use the signature from opInfo?
-        Class<?> types[] = new Class[signature.length];
+        Class<?>[] types = new Class[signature.length];
         for (int i = 0; i < signature.length; i++) {
             types[i] = BaseModelMBean.getAttributeClass(signature[i]);
         }

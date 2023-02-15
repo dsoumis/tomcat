@@ -607,7 +607,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
         }
@@ -654,7 +654,7 @@ public class ApplicationContext implements ServletContext {
         boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
         }

@@ -351,7 +351,7 @@ public class DataSourceStore extends StoreBase {
      * @exception IOException if an input/output error occurred
      */
     private String[] keys(boolean expiredOnly) throws IOException {
-        String keys[] = null;
+        String[] keys = null;
         int numberOfTries = 2;
         while (numberOfTries > 0) {
 

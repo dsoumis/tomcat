@@ -666,7 +666,7 @@ public class MBeanFactory {
             address = ObjectName.unquote(address);
         }
 
-        Connector conns[] = service.findConnectors();
+        Connector[] conns = service.findConnectors();
 
         for (Connector conn : conns) {
             String connAddress = null;

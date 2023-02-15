@@ -49,13 +49,13 @@ public final class IntrospectionUtils {
         String setter = "set" + capitalize(name);
 
         try {
-            Method methods[] = findMethods(o.getClass());
+            Method[] methods = findMethods(o.getClass());
             Method setPropertyMethodVoid = null;
             Method setPropertyMethodBool = null;
 
             // First, the ideal case - a setFoo( String ) method
             for (Method item : methods) {
-                Class<?> paramT[] = item.getParameterTypes();
+                Class<?>[] paramT = item.getParameterTypes();
                 if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
 
@@ -72,7 +72,7 @@ public final class IntrospectionUtils {
 
                     // match - find the type and invoke it
                     Class<?> paramType = method.getParameterTypes()[0];
-                    Object params[] = new Object[1];
+                    Object[] params = new Object[1];
 
                     // Try a setFoo ( int )
                     if ("java.lang.Integer".equals(paramType.getName())
@@ -138,7 +138,7 @@ public final class IntrospectionUtils {
 
             // Ok, no setXXX found, try a setProperty("name", "value")
             if (setPropertyMethodBool != null || setPropertyMethodVoid != null) {
-                Object params[] = new Object[2];
+                Object[] params = new Object[2];
                 params[0] = name;
                 params[1] = value;
                 if (setPropertyMethodBool != null) {
@@ -196,7 +196,7 @@ public final class IntrospectionUtils {
         if (name == null || name.length() == 0) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }
@@ -213,7 +213,7 @@ public final class IntrospectionUtils {
     static Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
 
     public static Method[] findMethods(Class<?> c) {
-        Method methods[] = objectMethods.get(c);
+        Method[] methods = objectMethods.get(c);
         if (methods != null) {
           return methods;
         }

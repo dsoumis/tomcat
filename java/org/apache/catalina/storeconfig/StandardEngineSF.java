@@ -52,7 +52,7 @@ public class StandardEngineSF extends StoreFactoryBase {
         if (aEngine instanceof StandardEngine) {
             StandardEngine engine = (StandardEngine) aEngine;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = engine.findLifecycleListeners();
+            LifecycleListener[] listeners = engine.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Realm> element
@@ -68,7 +68,7 @@ public class StandardEngineSF extends StoreFactoryBase {
             }
 
             // Store nested <Valve> elements
-            Valve valves[] = engine.getPipeline().getValves();
+            Valve[] valves = engine.getPipeline().getValves();
             if(valves != null && valves.length > 0 ) {
                 List<Valve> engineValves = new ArrayList<>() ;
                 for (Valve valve : valves) {
@@ -85,7 +85,7 @@ public class StandardEngineSF extends StoreFactoryBase {
                 storeElement(aWriter, indent, cluster);
             }
             // store all <Host> elements
-            Container children[] = engine.findChildren();
+            Container[] children = engine.findChildren();
             storeElementArray(aWriter, indent, children);
 
        }

@@ -1957,7 +1957,7 @@ public class JNDIRealm extends RealmBase {
         if (connection.roleBaseFormat != null) {
             NameParser np = connection.context.getNameParser("");
             Name name = np.parse(dn);
-            String nameParts[] = new String[name.size()];
+            String[] nameParts = new String[name.size()];
             for (int i = 0; i < name.size(); i++) {
                 // May have been returned with \<char> escaping rather than
                 // \<hex><hex>. Make sure it is \<hex><hex>.

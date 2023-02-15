@@ -56,9 +56,9 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
     private static final String VALID = "** valid data **";
     private static final String INVALID = "* invalid data *";
 
-    protected static final Integer BUFFERS[] = new Integer[] { Integer.valueOf (16), Integer.valueOf(8 * 1024), Integer.valueOf(16 * 1024) };
+    protected static final Integer[] BUFFERS = new Integer[] { Integer.valueOf (16), Integer.valueOf(8 * 1024), Integer.valueOf(16 * 1024) };
 
-    protected static final Integer COUNTS[] = new Integer[] { Integer.valueOf(0), Integer.valueOf(1),
+    protected static final Integer[] COUNTS = new Integer[] { Integer.valueOf(0), Integer.valueOf(1),
             Integer.valueOf(511), Integer.valueOf(512), Integer.valueOf(513),
             Integer.valueOf(1023), Integer.valueOf(1024), Integer.valueOf(1025) };
 

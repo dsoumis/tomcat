@@ -51,7 +51,7 @@ public class ELParser {
 
     private final boolean isDeferredSyntaxAllowedAsLiteral;
 
-    private static final String reservedWords[] = { "and", "div", "empty",
+    private static final String[] reservedWords = { "and", "div", "empty",
             "eq", "false", "ge", "gt", "instanceof", "le", "lt", "mod", "ne",
             "not", "null", "or", "true" };
 

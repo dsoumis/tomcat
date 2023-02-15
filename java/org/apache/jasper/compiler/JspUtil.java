@@ -51,7 +51,7 @@ public class JspUtil {
     private static final String OPEN_EXPR = "<%=";
     private static final String CLOSE_EXPR = "%>";
 
-    private static final String javaKeywords[] = { "abstract", "assert",
+    private static final String[] javaKeywords = { "abstract", "assert",
             "boolean", "break", "byte", "case", "catch", "char", "class",
             "const", "continue", "default", "do", "double", "else", "enum",
             "extends", "final", "finally", "float", "for", "goto", "if",
@@ -729,7 +729,7 @@ public class JspUtil {
      * @return Java package corresponding to the given path
      */
     public static final String makeJavaPackage(String path) {
-        String classNameComponents[] = path.split("/");
+        String[] classNameComponents = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
         for (String classNameComponent : classNameComponents) {
             if (classNameComponent.length() > 0) {

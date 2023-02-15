@@ -208,7 +208,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
      * @param names Names of the requested attributes
      */
     @Override
-    public AttributeList getAttributes(String names[]) {
+    public AttributeList getAttributes(String[] names) {
 
         // Validate the input parameters
         if (names == null) {
@@ -264,7 +264,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
      *  occurs when invoking a method
      */
     @Override
-    public Object invoke(String name, Object params[], String signature[])
+    public Object invoke(String name, Object[] params, String[] signature)
         throws MBeanException, ReflectionException
     {
         if( (resource instanceof DynamicMBean) &&
@@ -474,7 +474,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         }
 
         // Prepare and return our response, eating all exceptions
-        String names[] = new String[attributes.size()];
+        String[] names = new String[attributes.size()];
         int n = 0;
         for (Object attribute : attributes) {
             Attribute item = (Attribute) attribute;
@@ -826,8 +826,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
     public MBeanNotificationInfo[] getNotificationInfo() {
 
         // Acquire the set of application notifications
-        MBeanNotificationInfo current[] = getMBeanInfo().getNotifications();
-        MBeanNotificationInfo response[] =
+        MBeanNotificationInfo[] current = getMBeanInfo().getNotifications();
+        MBeanNotificationInfo[] response =
             new MBeanNotificationInfo[current.length + 2];
  //       Descriptor descriptor = null;
 

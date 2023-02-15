@@ -210,7 +210,7 @@ public abstract class JspWriter extends java.io.Writer {
      * @throws java.io.IOException
      *             If an error occurred while writing
      */
-    public abstract void print(char s[]) throws IOException;
+    public abstract void print(char[] s) throws IOException;
 
     /**
      * Print a string. If the argument is <code>null</code> then the string
@@ -335,7 +335,7 @@ public abstract class JspWriter extends java.io.Writer {
      * @throws java.io.IOException
      *             If an error occurred while writing
      */
-    public abstract void println(char x[]) throws IOException;
+    public abstract void println(char[] x) throws IOException;
 
     /**
      * Print a String and then terminate the line. This method behaves as though

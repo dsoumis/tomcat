@@ -360,7 +360,7 @@ public class SSLHostConfig implements Serializable {
             StringBuilder sb = new StringBuilder();
             // Not obviously in OpenSSL format. May be a single OpenSSL or JSSE
             // cipher name. May be a comma separated list of cipher names
-            String ciphers[] = ciphersList.split(",");
+            String[] ciphers = ciphersList.split(",");
             for (String cipher : ciphers) {
                 String trimmed = cipher.trim();
                 if (trimmed.length() > 0) {

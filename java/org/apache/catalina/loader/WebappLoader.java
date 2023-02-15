@@ -286,7 +286,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
     public String getLoaderRepositoriesString() {
-        String repositories[]=getLoaderRepositories();
+        String[] repositories =getLoaderRepositories();
         StringBuilder sb=new StringBuilder();
         for (String repository : repositories) {
             sb.append(repository).append(':');
@@ -520,7 +520,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     private boolean buildClassPath(StringBuilder classpath, ClassLoader loader) {
         if (loader instanceof URLClassLoader) {
-            URL repositories[] = ((URLClassLoader) loader).getURLs();
+            URL[] repositories = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
                 if (repository.startsWith("file://")) {

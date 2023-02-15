@@ -184,7 +184,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // Add the roles as additional subjects as per the contract with the
             // JAASRealm
             if (principal instanceof GenericPrincipal) {
-                String roles[] = ((GenericPrincipal) principal).getRoles();
+                String[] roles = ((GenericPrincipal) principal).getRoles();
                 for (String role : roles) {
                     subject.getPrincipals().add(new GenericPrincipal(role));
                 }
@@ -272,7 +272,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (callbackHandler == null) {
             throw new LoginException(sm.getString("jaasMemoryLoginModule.noCallbackHandler"));
         }
-        Callback callbacks[] = new Callback[9];
+        Callback[] callbacks = new Callback[9];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
         callbacks[2] = new TextInputCallback("nonce");
@@ -396,7 +396,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             return null;
         }
 
-        Callback callbacks[] = new Callback[1];
+        Callback[] callbacks = new Callback[1];
         callbacks[0] = new TextInputCallback("catalinaBase");
 
         String result = null;

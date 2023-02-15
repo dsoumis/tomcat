@@ -160,7 +160,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
      * @param b Unused
      * @throws IOException Never happens
      */
-    public void write(byte b[]) throws IOException {
+    public void write(byte[] b) throws IOException {
         // NOOP
     }
     /**
@@ -169,7 +169,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
      * @param len Unused
      * @throws IOException Never happens
      */
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         // NOOP
     }
     @Override

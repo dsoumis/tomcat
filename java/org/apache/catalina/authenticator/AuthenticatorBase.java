@@ -1218,7 +1218,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // path, if there is one
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
-            Valve valves[] = parent.getPipeline().getValves();
+            Valve[] valves = parent.getPipeline().getValves();
             for (Valve valve : valves) {
                 if (valve instanceof SingleSignOn) {
                     sso = (SingleSignOn) valve;

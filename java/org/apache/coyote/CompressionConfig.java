@@ -299,7 +299,7 @@ public class CompressionConfig {
      * @param sArray the StringArray
      * @param value  string
      */
-    private static boolean startsWithStringArray(String sArray[], String value) {
+    private static boolean startsWithStringArray(String[] sArray, String value) {
         if (value == null) {
             return false;
         }

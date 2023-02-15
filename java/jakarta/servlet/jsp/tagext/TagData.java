@@ -53,7 +53,7 @@ public class TagData implements Cloneable {
      *
      * @param atts the static attribute and values.  May be null.
      */
-    public TagData(Object[] atts[]) {
+    public TagData(Object[][] atts) {
         if (atts == null) {
             attributes = new Hashtable<>();
         } else {

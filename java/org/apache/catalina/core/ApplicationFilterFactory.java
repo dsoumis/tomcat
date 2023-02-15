@@ -74,7 +74,7 @@ public final class ApplicationFilterFactory {
         // Acquire the filter mappings for this Context
         StandardContext context = (StandardContext) wrapper.getParent();
         filterChain.setDispatcherWrapsSameObject(context.getDispatcherWrapsSameObject());
-        FilterMap filterMaps[] = context.findFilterMaps();
+        FilterMap[] filterMaps = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
         if ((filterMaps == null) || (filterMaps.length == 0)) {

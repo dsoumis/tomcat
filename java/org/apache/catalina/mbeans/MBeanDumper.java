@@ -69,7 +69,7 @@ public class MBeanDumper {
                 buf.append(code);
                 buf.append(CRLF);
 
-                MBeanAttributeInfo attrs[] = minfo.getAttributes();
+                MBeanAttributeInfo[] attrs = minfo.getAttributes();
                 Object value = null;
 
                 for (MBeanAttributeInfo attr : attrs) {

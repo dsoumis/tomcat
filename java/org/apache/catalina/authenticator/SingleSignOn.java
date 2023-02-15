@@ -225,7 +225,7 @@ public class SingleSignOn extends ValveBase {
             containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
         }
         Cookie cookie = null;
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie value : cookies) {
                 if (cookieName.equals(value.getName())) {

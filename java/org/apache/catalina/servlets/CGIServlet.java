@@ -489,7 +489,7 @@ public final class CGIServlet extends HttpServlet {
         log.trace("HttpServletRequest Properties");
         log.trace("Auth Type: [" + req.getAuthType() + "]");
         log.trace("Context Path: [" + req.getContextPath() + "]");
-        Cookie cookies[] = req.getCookies();
+        Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 log.trace("Cookie: " + cookie.getName() + ": [" + cookie.getValue() + "]");

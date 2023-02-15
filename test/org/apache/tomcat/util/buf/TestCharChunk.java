@@ -76,7 +76,7 @@ public class TestCharChunk {
         cc.setCharOutputChannel(new Sink());
         // Defaults to no limit
 
-        char data[] = new char[32 * 1024 * 1024];
+        char[] data = new char[32 * 1024 * 1024];
 
         for (int i = 0; i < 100; i++) {
             cc.append(data, 0, data.length);

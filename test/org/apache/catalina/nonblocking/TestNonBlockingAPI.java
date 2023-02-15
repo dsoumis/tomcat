@@ -1142,7 +1142,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 public void onDataAvailable() {
 
                     try {
-                        byte buffer[] = new byte[1 * 4];
+                        byte[] buffer = new byte[1 * 4];
                         while (is.isReady() && !is.isFinished()) {
                             @SuppressWarnings("unused")
                             int ignore = is.read(buffer);
@@ -1285,7 +1285,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 public void onDataAvailable() {
 
                     try {
-                        byte buffer[] = new byte[1 * 1024];
+                        byte[] buffer = new byte[1 * 1024];
                         while (is.isReady() && !is.isFinished()) {
                             is.read(buffer);
                         }

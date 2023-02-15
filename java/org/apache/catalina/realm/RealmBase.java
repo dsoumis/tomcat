@@ -423,7 +423,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *                  itself.
      */
     @Override
-    public Principal authenticate(X509Certificate certs[]) {
+    public Principal authenticate(X509Certificate[] certs) {
 
         if ((certs == null) || (certs.length < 1)) {
             return null;
@@ -529,7 +529,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         ArrayList<SecurityConstraint> results = null;
         // Are there any defined security constraints?
-        SecurityConstraint constraints[] = context.findConstraints();
+        SecurityConstraint[] constraints = context.findConstraints();
         if ((constraints == null) || (constraints.length == 0)) {
             if (log.isDebugEnabled()) {
                 log.debug("  No applicable constraints defined");
@@ -792,7 +792,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         boolean status = false;
         boolean denyfromall = false;
         for (SecurityConstraint constraint : constraints) {
-            String roles[];
+            String[] roles;
             if (constraint.getAllRoles()) {
                 // * means all roles defined in web.xml
                 roles = request.getContext().findSecurityRoles();
@@ -851,7 +851,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             // Check for an all roles(role-name="*")
             for (SecurityConstraint constraint : constraints) {
-                String roles[];
+                String[] roles;
                 // If the all roles mode exists, sets
                 if (constraint.getAllRoles()) {
                     if (allRolesMode == AllRolesMode.AUTH_ONLY_MODE) {
@@ -1277,7 +1277,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param args The parameters passed on the command line
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         // Use negative values since null is not an option to indicate 'not set'
         int saltLength = -1;

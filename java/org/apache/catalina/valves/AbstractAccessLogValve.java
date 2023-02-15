@@ -253,7 +253,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             /* Helper object to be able to call SimpleDateFormat.format(). */
             private final Date currentDate = new Date();
 
-            protected final String cache[];
+            protected final String[] cache;
             private SimpleDateFormat formatter;
             private boolean isCLF = false;
 

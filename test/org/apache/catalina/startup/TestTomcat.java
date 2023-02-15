@@ -136,7 +136,7 @@ public class TestTomcat extends TomcatBaseTest {
                 // Read some content from the resource
                 URLConnection conn = url.openConnection();
 
-                char cbuf[] = new char[20];
+                char[] cbuf = new char[20];
                 int read = 0;
                 try (InputStream is = conn.getInputStream();
                         Reader reader = new InputStreamReader(is)) {

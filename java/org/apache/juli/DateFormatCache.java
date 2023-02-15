@@ -114,7 +114,7 @@ public class DateFormatCache {
         /* Helper object to be able to call SimpleDateFormat.format(). */
         private final Date currentDate = new Date();
 
-        private String cache[];
+        private String[] cache;
         private SimpleDateFormat formatter;
 
         private Cache parent = null;

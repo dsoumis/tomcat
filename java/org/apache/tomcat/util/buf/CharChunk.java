@@ -62,7 +62,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
          * @param len length that will be written
          * @throws IOException If an I/O occurs while writing the characters
          */
-        void realWriteChars(char buf[], int off, int len) throws IOException;
+        void realWriteChars(char[] buf, int off, int len) throws IOException;
     }
 
     // --------------------
@@ -190,7 +190,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      * @param len Length
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(char src[], int off, int len) throws IOException {
+    public void append(char[] src, int off, int len) throws IOException {
         // will grow, up to limit
         makeSpace(len);
         int limit = getLimitInternal();
@@ -298,7 +298,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    public int subtract(char dest[], int off, int len) throws IOException {
+    public int subtract(char[] dest, int off, int len) throws IOException {
         if (checkEof()) {
             return -1;
         }
@@ -473,8 +473,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    public boolean equals(char b2[], int off2, int len2) {
-        char b1[] = buff;
+    public boolean equals(char[] b2, int off2, int len2) {
+        char[] b1 = buff;
         if (b1 == null && b2 == null) {
             return true;
         }
@@ -599,7 +599,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      * @return The position of the first instance of the character or -1 if the
      *         character is not found.
      */
-    public static int indexOf(char chars[], int start, int end, char s) {
+    public static int indexOf(char[] chars, int start, int end, char s) {
         int offset = start;
 
         while (offset < end) {

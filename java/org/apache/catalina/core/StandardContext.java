@@ -199,7 +199,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The set of application listener class names configured for this application, in the order they were encountered
      * in the resulting merged web.xml file.
      */
-    private String applicationListeners[] = new String[0];
+    private String[] applicationListeners = new String[0];
 
     private final Object applicationListenersLock = new Object();
 
@@ -220,7 +220,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The set of instantiated application lifecycle listener objects. Note that SCIs and other code may use the
      * pluggability APIs to add listener instances directly to this list before the application starts.
      */
-    private Object applicationLifecycleListenersObjects[] = new Object[0];
+    private Object[] applicationLifecycleListenersObjects = new Object[0];
 
 
     /**
@@ -232,7 +232,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The set of application parameters defined for this application.
      */
-    private ApplicationParameter applicationParameters[] = new ApplicationParameter[0];
+    private ApplicationParameter[] applicationParameters = new ApplicationParameter[0];
 
     private final Object applicationParametersLock = new Object();
 
@@ -269,7 +269,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The security constraints for this web application.
      */
-    private volatile SecurityConstraint constraints[] = new SecurityConstraint[0];
+    private volatile SecurityConstraint[] constraints = new SecurityConstraint[0];
 
     private final Object constraintsLock = new Object();
 
@@ -499,7 +499,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The security roles for this application, keyed by role name.
      */
-    private String securityRoles[] = new String[0];
+    private String[] securityRoles = new String[0];
 
     private final Object securityRolesLock = new Object();
 
@@ -538,7 +538,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The watched resources for this application.
      */
-    private String watchedResources[] = new String[0];
+    private String[] watchedResources = new String[0];
 
     private final Object watchedResourcesLock = new Object();
 
@@ -546,7 +546,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The welcome files for this application.
      */
-    private String welcomeFiles[] = new String[0];
+    private String[] welcomeFiles = new String[0];
 
     private final Object welcomeFilesLock = new Object();
 
@@ -555,7 +555,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The set of classnames of LifecycleListeners that will be added to each newly created Wrapper by
      * <code>createWrapper()</code>.
      */
-    private String wrapperLifecycles[] = new String[0];
+    private String[] wrapperLifecycles = new String[0];
 
     private final Object wrapperLifecyclesLock = new Object();
 
@@ -563,7 +563,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The set of classnames of ContainerListeners that will be added to each newly created Wrapper by
      * <code>createWrapper()</code>.
      */
-    private String wrapperListeners[] = new String[0];
+    private String[] wrapperListeners = new String[0];
 
     private final Object wrapperListenersLock = new Object();
 
@@ -1318,7 +1318,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * result may be either set of listeners or a the union of both.
      */
     @Override
-    public void setApplicationEventListeners(Object listeners[]) {
+    public void setApplicationEventListeners(Object[] listeners) {
         applicationEventListenersList.clear();
         if (listeners != null && listeners.length > 0) {
             applicationEventListenersList.addAll(Arrays.asList(listeners));
@@ -1349,7 +1349,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * @param listeners The set of instantiated listener objects.
      */
     @Override
-    public void setApplicationLifecycleListeners(Object listeners[]) {
+    public void setApplicationLifecycleListeners(Object[] listeners) {
         applicationLifecycleListenersObjects = listeners;
     }
 
@@ -2717,7 +2717,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addApplicationListener(String listener) {
 
         synchronized (applicationListenersLock) {
-            String results[] = new String[applicationListeners.length + 1];
+            String[] results = new String[applicationListeners.length + 1];
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (listener.equals(applicationListeners[i])) {
                     log.info(sm.getString("standardContext.duplicateListener", listener));
@@ -2748,7 +2748,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     return;
                 }
             }
-            ApplicationParameter results[] = Arrays.copyOf(applicationParameters, applicationParameters.length + 1);
+            ApplicationParameter[] results = Arrays.copyOf(applicationParameters, applicationParameters.length + 1);
             results[applicationParameters.length] = parameter;
             applicationParameters = results;
         }
@@ -2808,9 +2808,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addConstraint(SecurityConstraint constraint) {
 
         // Validate the proposed constraint
-        SecurityCollection collections[] = constraint.findCollections();
+        SecurityCollection[] collections = constraint.findCollections();
         for (SecurityCollection collection : collections) {
-            String patterns[] = collection.findPatterns();
+            String[] patterns = collection.findPatterns();
             for (int j = 0; j < patterns.length; j++) {
                 patterns[j] = adjustURLPattern(patterns[j]);
                 if (!validateURLPattern(patterns[j])) {
@@ -3586,7 +3586,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified listener
             int j = 0;
-            String results[] = new String[applicationListeners.length - 1];
+            String[] results = new String[applicationListeners.length - 1];
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (i != n) {
                     results[j++] = applicationListeners[i];
@@ -3626,7 +3626,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified parameter
             int j = 0;
-            ApplicationParameter results[] = new ApplicationParameter[applicationParameters.length - 1];
+            ApplicationParameter[] results = new ApplicationParameter[applicationParameters.length - 1];
             for (int i = 0; i < applicationParameters.length; i++) {
                 if (i != n) {
                     results[j++] = applicationParameters[i];
@@ -3685,7 +3685,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified constraint
             int j = 0;
-            SecurityConstraint results[] = new SecurityConstraint[constraints.length - 1];
+            SecurityConstraint[] results = new SecurityConstraint[constraints.length - 1];
             for (int i = 0; i < constraints.length; i++) {
                 if (i != n) {
                     results[j++] = constraints[i];
@@ -3826,7 +3826,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified security role
             int j = 0;
-            String results[] = new String[securityRoles.length - 1];
+            String[] results = new String[securityRoles.length - 1];
             for (int i = 0; i < securityRoles.length; i++) {
                 if (i != n) {
                     results[j++] = securityRoles[i];
@@ -3886,7 +3886,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified watched resource
             int j = 0;
-            String results[] = new String[watchedResources.length - 1];
+            String[] results = new String[watchedResources.length - 1];
             for (int i = 0; i < watchedResources.length; i++) {
                 if (i != n) {
                     results[j++] = watchedResources[i];
@@ -3925,7 +3925,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified welcome file
             int j = 0;
-            String results[] = new String[welcomeFiles.length - 1];
+            String[] results = new String[welcomeFiles.length - 1];
             for (int i = 0; i < welcomeFiles.length; i++) {
                 if (i != n) {
                     results[j++] = welcomeFiles[i];
@@ -3968,7 +3968,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified lifecycle listener
             int j = 0;
-            String results[] = new String[wrapperLifecycles.length - 1];
+            String[] results = new String[wrapperLifecycles.length - 1];
             for (int i = 0; i < wrapperLifecycles.length; i++) {
                 if (i != n) {
                     results[j++] = wrapperLifecycles[i];
@@ -4009,7 +4009,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // Remove the specified listener
             int j = 0;
-            String results[] = new String[wrapperListeners.length - 1];
+            String[] results = new String[wrapperListeners.length - 1];
             for (int i = 0; i < wrapperListeners.length; i++) {
                 if (i != n) {
                     results[j++] = wrapperListeners[i];
@@ -4214,7 +4214,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
          */
         public void add(FilterMap filterMap) {
             synchronized (lock) {
-                FilterMap results[] = Arrays.copyOf(array, array.length + 1);
+                FilterMap[] results = Arrays.copyOf(array, array.length + 1);
                 results[array.length] = filterMap;
                 array = results;
             }
@@ -4228,7 +4228,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
          */
         public void addBefore(FilterMap filterMap) {
             synchronized (lock) {
-                FilterMap results[] = new FilterMap[array.length + 1];
+                FilterMap[] results = new FilterMap[array.length + 1];
                 System.arraycopy(array, 0, results, 0, insertPoint);
                 System.arraycopy(array, insertPoint, results, insertPoint + 1, array.length - insertPoint);
                 results[insertPoint] = filterMap;
@@ -4257,7 +4257,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 }
 
                 // Remove the specified filter mapping
-                FilterMap results[] = new FilterMap[array.length - 1];
+                FilterMap[] results = new FilterMap[array.length - 1];
                 System.arraycopy(array, 0, results, 0, n);
                 System.arraycopy(array, n + 1, results, n, (array.length - 1) - n);
                 array = results;
@@ -4358,8 +4358,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Instantiate the required listeners
-        String listeners[] = findApplicationListeners();
-        Object results[] = new Object[listeners.length];
+        String[] listeners = findApplicationListeners();
+        Object[] results = new Object[listeners.length];
         boolean ok = true;
         for (int i = 0; i < results.length; i++) {
             if (getLogger().isDebugEnabled()) {
@@ -4419,7 +4419,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         getServletContext();
         context.setNewServletContextListenerAllowed(false);
 
-        Object instances[] = getApplicationLifecycleListeners();
+        Object[] instances = getApplicationLifecycleListeners();
         if (instances == null || instances.length == 0) {
             return ok;
         }
@@ -4467,7 +4467,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         boolean ok = true;
-        Object listeners[] = getApplicationLifecycleListeners();
+        Object[] listeners = getApplicationLifecycleListeners();
         if (listeners != null && listeners.length > 0) {
             ServletContextEvent event = new ServletContextEvent(getServletContext());
             ServletContextEvent tldEvent = null;
@@ -4601,7 +4601,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *
      * @return <code>true</code> if load on startup was considered successful
      */
-    public boolean loadOnStartup(Container children[]) {
+    public boolean loadOnStartup(Container[] children) {
 
         // Collect "load on startup" servlets that need to be initialized
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
@@ -5025,12 +5025,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private void mergeParameters() {
         Map<String, String> mergedParams = new HashMap<>();
 
-        String names[] = findParameters();
+        String[] names = findParameters();
         for (String s : names) {
             mergedParams.put(s, findParameter(s));
         }
 
-        ApplicationParameter params[] = findApplicationParameters();
+        ApplicationParameter[] params = findApplicationParameters();
         for (ApplicationParameter param : params) {
             if (param.getOverride()) {
                 mergedParams.computeIfAbsent(param.getName(), k -> param.getValue());
@@ -5575,7 +5575,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public boolean fireRequestInitEvent(ServletRequest request) {
 
-        Object instances[] = getApplicationEventListeners();
+        Object[] instances = getApplicationEventListeners();
 
         if ((instances != null) && (instances.length > 0)) {
 
@@ -5608,7 +5608,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public boolean fireRequestDestroyEvent(ServletRequest request) {
-        Object instances[] = getApplicationEventListeners();
+        Object[] instances = getApplicationEventListeners();
 
         if ((instances != null) && (instances.length > 0)) {
 

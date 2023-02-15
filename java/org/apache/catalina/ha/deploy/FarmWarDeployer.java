@@ -553,7 +553,7 @@ public class FarmWarDeployer extends ClusterListener
      */
     protected void undeployDir(File dir) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }

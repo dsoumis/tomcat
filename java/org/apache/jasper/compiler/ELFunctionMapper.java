@@ -219,7 +219,7 @@ public class ELFunctionMapper {
                             getCanonicalName(funcInfo.getFunctionClass()) +
                             ".class, " + '\"' + f.getMethodName() + "\", " +
                             "new Class[] {");
-                    String params[] = f.getParameters();
+                    String[] params = f.getParameters();
                     for (int k = 0; k < params.length; k++) {
                         if (k != 0) {
                             ds.append(", ");

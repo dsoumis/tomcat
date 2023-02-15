@@ -1154,7 +1154,7 @@ public class AjpProcessor extends AbstractProcessor {
     protected final void populateSslRequestAttributes() {
         if (!certificates.isNull()) {
             ByteChunk certData = certificates.getByteChunk();
-            X509Certificate jsseCerts[] = null;
+            X509Certificate[] jsseCerts = null;
             ByteArrayInputStream bais =
                 new ByteArrayInputStream(certData.getBytes(),
                         certData.getStart(),

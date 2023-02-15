@@ -179,7 +179,7 @@ public class TestByteChunk {
         bc.setByteOutputChannel(new Sink());
         // Defaults to no limit
 
-        byte data[] = new byte[32 * 1024 * 1024];
+        byte[] data = new byte[32 * 1024 * 1024];
 
         for (int i = 0; i < 100; i++) {
             bc.append(data, 0, data.length);

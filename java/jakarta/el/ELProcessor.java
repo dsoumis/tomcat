@@ -112,7 +112,7 @@ public class ELProcessor {
         }
 
         // Only returns public methods. Module access is checked below.
-        Method methods[] = clazz.getMethods();
+        Method[] methods = clazz.getMethods();
 
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {

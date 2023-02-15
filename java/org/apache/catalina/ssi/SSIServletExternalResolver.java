@@ -48,7 +48,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSIServletExternalResolver implements SSIExternalResolver {
     private static final StringManager sm = StringManager.getManager(SSIServletExternalResolver.class);
-    protected final String VARIABLE_NAMES[] = {"AUTH_TYPE", "CONTENT_LENGTH",
+    protected final String[] VARIABLE_NAMES = {"AUTH_TYPE", "CONTENT_LENGTH",
             "CONTENT_TYPE", "DOCUMENT_NAME", "DOCUMENT_URI",
             "GATEWAY_INTERFACE", "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING",
             "HTTP_ACCEPT_LANGUAGE", "HTTP_CONNECTION", "HTTP_HOST",

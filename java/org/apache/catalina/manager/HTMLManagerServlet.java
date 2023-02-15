@@ -399,8 +399,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         // Apps Row Section
         // Create sorted map of deployed applications by context name.
-        Container children[] = host.findChildren();
-        String contextNames[] = new String[children.length];
+        Container[] children = host.findChildren();
+        String[] contextNames = new String[children.length];
         for (int i = 0; i < children.length; i++) {
             contextNames[i] = children[i].getName();
         }

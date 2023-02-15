@@ -215,7 +215,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     }
 
 
-    protected void getRandomBytes(byte bytes[]) {
+    protected void getRandomBytes(byte[] bytes) {
 
         SecureRandom random = randoms.poll();
         if (random == null) {

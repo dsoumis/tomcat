@@ -167,7 +167,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
     @Test
     public void testBug51557SeparatorsInName() throws Exception {
-        char httpSeparators[] = new char[] {
+        char[] httpSeparators = new char[] {
                 '\t', ' ', '\"', '(', ')', ',', '/', ':', ';', '<',
                 '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 

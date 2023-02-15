@@ -207,7 +207,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         private void populateFromInterfaces(Class<?> aClass) throws IntrospectionException {
-            Class<?> interfaces[] = aClass.getInterfaces();
+            Class<?>[] interfaces = aClass.getInterfaces();
             if (interfaces.length > 0) {
                 for (Class<?> ifs : interfaces) {
                     BeanInfo info = Introspector.getBeanInfo(ifs);

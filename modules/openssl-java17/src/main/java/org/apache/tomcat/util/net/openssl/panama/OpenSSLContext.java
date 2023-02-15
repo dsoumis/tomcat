@@ -650,7 +650,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), state.contextScope) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), state.contextScope) : null;
-                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) 
+                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
                                 caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {

@@ -265,7 +265,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         }
 
         private Exception doRequest(boolean limited, boolean swallow) {
-            char body[] = new char[hugeSize];
+            char[] body = new char[hugeSize];
             Arrays.fill(body, 'X');
 
             try {
@@ -376,7 +376,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         }
 
         private Exception doRequest(int status, boolean swallow) {
-            char body[] = new char[hugeSize];
+            char[] body = new char[hugeSize];
             Arrays.fill(body, 'X');
 
             try {

@@ -295,7 +295,7 @@ public class StandardManager extends ManagerBase {
         }
 
         // Expire all active sessions
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         for (Session session : sessions) {
             try {
                 if (session.isValid()) {
