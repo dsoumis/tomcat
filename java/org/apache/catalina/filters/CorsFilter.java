@@ -545,7 +545,7 @@ public class CorsFilter extends GenericFilter {
         if (originHeader == null || RequestUtil.isSameOrigin(request, originHeader)) {
             return CORSRequestType.NOT_CORS;
         }
-        if (originHeader.isEmpty() ||!RequestUtil.isValidOrigin(originHeader)) {
+        if (originHeader.isEmpty() || !RequestUtil.isValidOrigin(originHeader)) {
             return CORSRequestType.INVALID_CORS;
         }
         String method = request.getMethod();
