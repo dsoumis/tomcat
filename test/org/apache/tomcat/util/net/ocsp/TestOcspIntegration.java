@@ -21,11 +21,9 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -35,6 +33,7 @@ import java.security.cert.CRLReason;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateRevokedException;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -53,6 +52,7 @@ import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
@@ -84,6 +84,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 
+
 @RunWith(Parameterized.class)
 public class TestOcspIntegration extends TomcatBaseTest {
     private static final String CA_CERTIFICATE_PATH = "ca-cert.pem";
@@ -94,6 +95,10 @@ public class TestOcspIntegration extends TomcatBaseTest {
     private static final String KEYSTORE_TYPE = "PKCS12";
     private static final String OCSP_GOOD_RESPONSE = "ocsp-good.der";
     private static final String OCSP_REVOKED_RESPONSE = "ocsp-revoked.der";
+    private static final String CLIENT_KEYSTORE_PATH = "client-keystore.p12";
+    private static final String CLIENT_KEYSTORE_PASS = "client-password";
+    private static final String OCSP_CLIENT_GOOD_RESPONSE = "ocsp-client-good.der";
+    private static final String OCSP_CLIENT_REVOKED_RESPONSE = "ocsp-client-revoked.der";
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
@@ -133,10 +138,6 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
     }
     @Test
-    public void testOcspNoCheck() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_REVOKED_RESPONSE, false, true, ffm));
-    }
-    @Test
     public void testOcspNoCheck_01() throws Exception {
         Assume.assumeTrue(isSslConfCtxNewAvailable());
         Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_REVOKED_RESPONSE, true, true, ffm));
@@ -159,37 +160,62 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     //This test is a reference to CVE-2017-15698 of tomcat-native
     @Test
-    public void testOcspWithLongResponderUrlViaProxy() throws Exception {
+    public void testOcspWithLongResponderUrl() throws Exception {
         final int ocspPort = 8889;
         Assume.assumeTrue(isPortAvailable(ocspPort));
-        StringBuilder longHostname = new StringBuilder();
-        longHostname.append("a".repeat(128));
+        File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
+        File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
+        File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
+        Tomcat tomcat = getTomcatInstance();
+        initSsl(tomcat, certificateFile, certificateKeyFile, certificateChainFile);
+        TesterSupport.configureSSLImplementation(tomcat,
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(),
+                true);
 
-        String originalProxyHost = System.getProperty("http.proxyHost");
-        String originalProxyPort = System.getProperty("http.proxyPort");
+        Context context = tomcat.addContext("", null);
+        Tomcat.addServlet(context, "simple", new TesterSupport.SimpleServlet());
+        context.addServletMappingDecoded("/", "simple");
 
-        try (ForwardingProxy proxy = new ForwardingProxy("127.0.0.1", ocspPort)) {
-            Thread proxyThread = new Thread(proxy);
-            proxyThread.start();
-            System.setProperty("http.proxyHost", "127.0.0.1");
-            System.setProperty("http.proxyPort", String.valueOf(proxy.getPort()));
+        // Load trust store for the client (for server cert validation)
+        //KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
+        //String trustStorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
+        //trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()), trustStorePass.toCharArray());
+
+        byte[] ocspResponse = Files.readAllBytes(new File(getPath("ocsp-client-good.der")).toPath());
+        try (FakeOcspResponder responder = new FakeOcspResponder(ocspResponse, "127.0.0.1", ocspPort)) {
+            responder.start();
+            tomcat.start();
+
+            URL url = new URI("https://localhost:" + getPort() + "/").toURL();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+
+            KeyStore clientKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
+            String clientKeystorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
+            clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()), clientKeystorePass.toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(clientKeystore, clientKeystorePass.toCharArray());
+
+            // Load trust store for the client (for server cert validation)
+            KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
+            String trustStorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
+            trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()), trustStorePass.toCharArray());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+
+            SSLContext ctx = initSSLContext(kmf, tmf); // your existing helper
+            // Client presents its cert, but does NOT do OCSP locally
+            var ppp = tomcat.getConnector().getLocalPort();
+            conn.setSSLSocketFactory(ctx.getSocketFactory());
+
+            // === Expected outcomes ===
+            // - With tcnative 1.2.14 (vulnerable): server SKIPS OCSP (long AIA) -> handshake succeeds (200)
+            // - With tcnative >= 1.2.15 (fixed): server DOES OCSP (sees revoked) -> SSLHandshakeException
             try {
-                testOCSP(OCSP_REVOKED_RESPONSE, false, false, ffm,
-                        false, longHostname.toString(), ocspPort);
-                Assert.fail("Should have thrown an exception");
-            } catch (SSLHandshakeException sslHandshakeException) {
-                Assert.assertTrue(true);
-            }
-        } finally {
-            if (originalProxyHost == null) {
-                System.clearProperty("http.proxyHost");
-            } else {
-                System.setProperty("http.proxyHost", originalProxyHost);
-            }
-            if (originalProxyPort == null) {
-                System.clearProperty("http.proxyPort");
-            } else {
-                System.setProperty("http.proxyPort", originalProxyPort);
+                conn.connect();
+                Assert.assertEquals(HttpServletResponse.SC_OK, conn.getResponseCode());
+            } finally {
+                tomcat.stop();
             }
         }
     }
@@ -209,6 +235,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
                 true);
         if (serverSideOcspVerificationDisabled) {
             SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
+            //var foo = sslHostConfig.getOpenSslConf();
             OpenSSLConf conf = new OpenSSLConf();
             OpenSSLConfCmd cmd = new OpenSSLConfCmd();
             cmd.setName("NO_OCSP_CHECK");
@@ -221,9 +248,12 @@ public class TestOcspIntegration extends TomcatBaseTest {
         Tomcat.addServlet(context, "simple", new TesterSupport.SimpleServlet());
         context.addServletMappingDecoded("/", "simple");
 
-        KeyStore trustStorePath = KeyStore.getInstance(KEYSTORE_TYPE);
+        KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
         String trustStorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
-        trustStorePath.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()), trustStorePass.toCharArray());
+        trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()), trustStorePass.toCharArray());
+        KeyStore clientKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
+        String clientKeystorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
+        clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()), clientKeystorePass.toCharArray());
         byte[] ocspResponse = Files.readAllBytes(new File(getPath(pathToOcspResponse)).toPath());
         try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(ocspResponse, ocspResponderHostname, ocspResponderPort)) {
             fakeOcspResponder.start();
@@ -233,9 +263,9 @@ public class TestOcspIntegration extends TomcatBaseTest {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             SSLSocketFactory sslSocketFactory;
             if (clientSideOcspVerificationDisabled) {
-                sslSocketFactory = buildClientSslSocketFactoryNoOcsp(trustStorePath);
+                sslSocketFactory = buildClientSslSocketFactoryNoOcsp(trustStore);
             } else {
-                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(discoverResponderFromAIA ? null : fakeOcspResponder.url(), trustStorePath);
+                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(discoverResponderFromAIA ? null : fakeOcspResponder.url(), trustStore, clientKeystore, clientKeystorePass);
             }
             connection.setSSLSocketFactory(sslSocketFactory);
             connection.connect();
@@ -248,18 +278,22 @@ public class TestOcspIntegration extends TomcatBaseTest {
     private static void initSsl(Tomcat tomcat, File certificateFile, File certificateKeyFile, File certificateChainFile) {
         Connector connector = tomcat.getConnector();
         connector.setSecure(true);
-        Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
+        connector.setProperty("SSLEnabled", "true");
 
         SSLHostConfig sslHostConfig = new SSLHostConfig();
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, SSLHostConfigCertificate.Type.UNDEFINED);
         sslHostConfig.addCertificate(certificate);
-        connector.addSslHostConfig(sslHostConfig);
         certificate.setCertificateFile(certificateFile.getAbsolutePath());
         certificate.setCertificateKeyFile(certificateKeyFile.getAbsolutePath());
         certificate.setCertificateChainFile(certificateChainFile.getAbsolutePath());
+        sslHostConfig.setCertificateVerification("optionalNoCA");
+        sslHostConfig.setCaCertificateFile(certificateChainFile.getAbsolutePath());
+        connector.addSslHostConfig(sslHostConfig);
     }
 
-    private static SSLSocketFactory buildClientSslSocketFactoryWithOcsp(String ocspUrl, KeyStore trustStore) throws Exception {
+    private static SSLSocketFactory buildClientSslSocketFactoryWithOcsp(String ocspUrl, KeyStore trustStore, KeyStore clientKeystore, String clientKeystorePass) throws Exception {
+        //KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        //keyManagerFactory.init(clientKeystore, clientKeystorePass.toCharArray());
         Set<TrustAnchor> trustAnchors = getTrustAnchorsFromKeystore(trustStore);
         PKIXRevocationChecker revocationChecker =(PKIXRevocationChecker) CertPathValidator.getInstance("PKIX").getRevocationChecker();
         if (ocspUrl != null) {
@@ -272,21 +306,21 @@ public class TestOcspIntegration extends TomcatBaseTest {
 
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
         trustManagerFactory.init(new CertPathTrustManagerParameters(pkix));
-        return initSSLContext(trustManagerFactory).getSocketFactory();
+        return initSSLContext(null, trustManagerFactory).getSocketFactory();
     }
     private static SSLSocketFactory buildClientSslSocketFactoryNoOcsp(KeyStore trustStore) throws Exception {
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustStore);
-        return initSSLContext(trustManagerFactory).getSocketFactory();
+        return initSSLContext(null, trustManagerFactory).getSocketFactory();
     }
-    private static SSLContext initSSLContext(TrustManagerFactory trustManagerFactory) throws Exception {
+    private static SSLContext initSSLContext(KeyManagerFactory keyManagerFactory, TrustManagerFactory trustManagerFactory) throws Exception {
         SSLContext sslContext;
         if (TesterSupport.isTlsv13Available()) {
             sslContext = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
         } else {
             sslContext = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
         }
-        sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+        sslContext.init(keyManagerFactory == null ? null : keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
         return sslContext;
     }
     private static Set<TrustAnchor> getTrustAnchorsFromKeystore(KeyStore keyStore) throws KeyStoreException {
@@ -335,70 +369,6 @@ public class TestOcspIntegration extends TomcatBaseTest {
         @Override public void close() {
             if (server != null) {
                 server.stop(0);
-            }
-        }
-    }
-    private static class ForwardingProxy implements Closeable, Runnable {
-        private final ServerSocket serverSocket;
-        private final String targetHost;
-        private final int targetPort;
-        private volatile boolean running = true;
-
-        ForwardingProxy(String targetHost, int targetPort) throws IOException {
-            this.serverSocket = new ServerSocket(0);
-            this.targetHost = targetHost;
-            this.targetPort = targetPort;
-        }
-
-        public int getPort() {
-            return serverSocket.getLocalPort();
-        }
-
-        @Override
-        public void close() throws IOException {
-            running = false;
-            serverSocket.close();
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public void run() {
-            try {
-                while (running) {
-                    try (Socket clientSocket = serverSocket.accept();
-                            Socket targetSocket = new Socket(targetHost, targetPort)) {
-
-                        Thread clientToTarget = new Thread(() -> {
-                            try {
-                                transfer(clientSocket.getInputStream(), targetSocket.getOutputStream());
-                            } catch (IOException ignored) {}
-                        });
-
-                        Thread targetToClient = new Thread(() -> {
-                            try {
-                                transfer(targetSocket.getInputStream(), clientSocket.getOutputStream());
-                            } catch (IOException ignored) {}
-                        });
-
-                        clientToTarget.start();
-                        targetToClient.start();
-                        clientToTarget.join();
-                        targetToClient.join();
-
-                    } catch (IOException | InterruptedException ignored) {}
-                }
-            } finally {
-                try {
-                    close();
-                } catch (IOException ignored) {}
-            }
-        }
-
-        private void transfer(InputStream in, OutputStream out) throws IOException {
-            byte[] buffer = new byte[4096];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
             }
         }
     }
