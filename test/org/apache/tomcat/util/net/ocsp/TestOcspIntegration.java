@@ -123,7 +123,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     @Test
     public void testOcspGood_03() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_CLIENT_GOOD_RESPONSE, true, false, ffm));
+        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, true, false, ffm));
     }
     @Test
     public void testOcspGood_04() throws Exception {
@@ -196,7 +196,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         final int ocspPort = 8888;
         Assume.assumeTrue(isPortAvailable(ocspPort));
         Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, false, true, ffm,
-                true, "127.0.0.1", ocspPort));
+                true, ocspPort));
     }
     //This test is a reference to CVE-2017-15698 of tomcat-native
     @Test
@@ -218,7 +218,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         context.addServletMappingDecoded("/", "simple");
 
         byte[] ocspResponse = Files.readAllBytes(new File(getPath("ocsp-client-good.der")).toPath());
-        try (FakeOcspResponder responder = new FakeOcspResponder(ocspResponse, "127.0.0.1", ocspPort)) {
+        try (FakeOcspResponder responder = new FakeOcspResponder(ocspResponse, ocspPort)) {
             responder.start();
             tomcat.start();
 
@@ -257,10 +257,10 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled, boolean ffm) throws Exception {
         return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled, ffm,
-                false, "127.0.0.1", 0);
+                false, 0);
     }
     private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled, boolean ffm,
-                        boolean discoverResponderFromAIA, String ocspResponderHostname, int ocspResponderPort) throws Exception {
+                         boolean clientDiscoversResponderFromAIA, int ocspResponderPort) throws Exception {
         File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
         File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
@@ -284,7 +284,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         String clientKeystorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
         clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()), clientKeystorePass.toCharArray());
         byte[] ocspResponse = Files.readAllBytes(new File(getPath(pathToOcspResponse)).toPath());
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(ocspResponse, ocspResponderHostname, ocspResponderPort)) {
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(ocspResponse, ocspResponderPort)) {
             fakeOcspResponder.start();
             tomcat.start();
 
@@ -292,7 +292,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             SSLSocketFactory sslSocketFactory;
             if (clientSideOcspVerificationEnabled) {
-                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(discoverResponderFromAIA ? null : fakeOcspResponder.url(), trustStore, clientKeystore, clientKeystorePass);
+                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(clientDiscoversResponderFromAIA ? null : fakeOcspResponder.url(), trustStore, clientKeystore, clientKeystorePass);
             } else {
                 sslSocketFactory = buildClientSslSocketFactoryNoOcsp(trustStore, clientKeystore, clientKeystorePass);
             }
@@ -315,7 +315,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         certificate.setCertificateFile(certificateFile.getAbsolutePath());
         certificate.setCertificateKeyFile(certificateKeyFile.getAbsolutePath());
         certificate.setCertificateChainFile(certificateChainFile.getAbsolutePath());
-        sslHostConfig.setCertificateVerification("none");
+        sslHostConfig.setCertificateVerification("optionalNoCA");
         sslHostConfig.setCaCertificateFile(certificateChainFile.getAbsolutePath());
         connector.addSslHostConfig(sslHostConfig);
     }
@@ -371,11 +371,9 @@ public class TestOcspIntegration extends TomcatBaseTest {
         private final byte[] ocspResponse;
         private HttpServer server;
         private int port;
-        private final String hostname;
 
-        FakeOcspResponder(byte[] ocspResponse, String hostname, int port) {
+        FakeOcspResponder(byte[] ocspResponse, int port) {
             this.ocspResponse = ocspResponse;
-            this.hostname = hostname;
             this.port = port;
         }
 
@@ -395,7 +393,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
 
         String url() {
-            return "http://" + hostname + ":" + port + "/ocsp";
+            return "http://127.0.0.1:" + port + "/ocsp";
         }
         @Override public void close() {
             if (server != null) {
