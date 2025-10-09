@@ -53,6 +53,7 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -90,13 +91,13 @@ public class TestOcspIntegration extends TomcatBaseTest {
     private static final String TRUSTSTORE_PATH = "trustStore.p12";
     private static final String TRUSTSTORE_PASS = "trust-password";
     private static final String KEYSTORE_TYPE = "PKCS12";
-    private static final String OCSP_GOOD_RESPONSE = "ocsp-good.der";
-    private static final String OCSP_REVOKED_RESPONSE = "ocsp-revoked.der";
+    private static final String OCSP_SERVER_CERT_GOOD_RESPONSE = "ocsp-good.der";
+    private static final String OCSP_SERVER_CERT_REVOKED_RESPONSE = "ocsp-revoked.der";
     private static final String CLIENT_KEYSTORE_PATH = "client-keystore.p12";
     private static final String CLIENT_KEYSTORE_PASS = "client-password";
-    private static final String OCSP_CLIENT_GOOD_RESPONSE = "ocsp-client-good.der";
-    private static final String OCSP_CLIENT_REVOKED_RESPONSE = "ocsp-client-revoked.der";
-    @Parameterized.Parameters(name = "{0}")
+    private static final String OCSP_CLIENT_CERT_GOOD_RESPONSE = "ocsp-client-good.der";
+    private static final String OCSP_CLIENT_CERT_REVOKED_RESPONSE = "ocsp-client-revoked.der";
+    @Parameterized.Parameters(name = "useFFM: {0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         parameterSets.add(new Object[] { Boolean.FALSE });
@@ -114,91 +115,67 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
 
     @Test
-    public void testOcspGood_01() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, false, true, ffm));
+    public void testOcspGood_ClientVerifiesServerCertificateOnly() throws Exception {
+        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, ffm));
     }
     @Test
-    public void testOcspGood_02() throws Exception {
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_GOOD_RESPONSE)).toPath()), 8889)){
+    public void testOcspGood_Mutual() throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue(isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_GOOD_RESPONSE)).toPath()), ocspResponderPortForClient)){
             fakeOcspResponder.start();
-            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, true, true, ffm));
+            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true, ffm));
         }
     }
     @Test
-    public void testOcspGood_03() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, true, false, ffm));
-    }
-    @Test
-    public void testOcspGood_04() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, false, false, ffm));
+    public void testOcspGood_ServerVerifiesClientCertificateOnly() throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue(isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_GOOD_RESPONSE)).toPath()), ocspResponderPortForClient)){
+            fakeOcspResponder.start();
+            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false, ffm));
+        }
     }
     @Test(expected = CertificateRevokedException.class)
-    public void testOcspRevoked_01() throws Exception {
+    public void testOcspRevoked_ClientVerifiesServerCertificateOnly() throws Exception {
+        try {
+            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, true, ffm);
+        }catch (SSLHandshakeException sslHandshakeException) {
+            handleExceptionWhenRevoked(sslHandshakeException);
+        }
+    }
+    @Test(expected = CertificateRevokedException.class)
+    public void testOcspRevoked_Mutual() throws Exception {
         try {
             // The exception is thrown before server side verification, while client does OCSP verification.
-            testOCSP(OCSP_REVOKED_RESPONSE, true, true, ffm);
+            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, true, ffm);
         }catch (SSLHandshakeException sslHandshakeException) {
-            if (sslHandshakeException.getCause().getCause() instanceof CertPathValidatorException cpe) {
-                Assert.assertEquals("REVOKED", cpe.getReason().toString());
-                Assert.assertTrue(cpe.toString().contains("reason: KEY_COMPROMISE"));
-                // Some JDKs only expose CertPathValidatorException
-                if (cpe.getCause() instanceof CertificateRevokedException) {
-                    throw (CertificateRevokedException) cpe.getCause();
-                } else {
-                    throw new CertificateRevokedException(new Date(), CRLReason.KEY_COMPROMISE, new X500Principal(""), new HashMap<>());
-                }
-            }
+            handleExceptionWhenRevoked(sslHandshakeException);
         }
     }
-    @Test(expected = CertificateRevokedException.class)
-    public void testOcspRevoked_02() throws Exception {
-        try {
-            testOCSP(OCSP_REVOKED_RESPONSE, false, true, ffm);
-        }catch (SSLHandshakeException sslHandshakeException) {
-            if (sslHandshakeException.getCause().getCause() instanceof CertPathValidatorException cpe) {
-                Assert.assertEquals("REVOKED", cpe.getReason().toString());
-                Assert.assertTrue(cpe.toString().contains("reason: KEY_COMPROMISE"));
-                // Some JDKs only expose CertPathValidatorException
-                if (cpe.getCause() instanceof CertificateRevokedException) {
-                    throw (CertificateRevokedException) cpe.getCause();
-                } else {
-                    throw new CertificateRevokedException(new Date(), CRLReason.KEY_COMPROMISE, new X500Principal(""), new HashMap<>());
-                }
-            }
+    @Test(expected = SSLException.class)
+    public void testOcspRevoked_ServerVerifiesClientCertificateOnly() throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue(isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_REVOKED_RESPONSE)).toPath()), ocspResponderPortForClient)){
+            fakeOcspResponder.start();
+            testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false, ffm);
         }
-    }
-    //TODO: Add certificate whenever serverSideVerificationEnabled is true
-    @Test//(expected = CertificateRevokedException.class)
-    public void testOcspRevoked_03() throws Exception {
-        testOCSP(OCSP_CLIENT_REVOKED_RESPONSE, true, false, ffm);
-        //try {
-        //    testOCSP(OCSP_REVOKED_RESPONSE, true, false, ffm);
-        //}catch (SSLHandshakeException sslHandshakeException) {
-        //    if (sslHandshakeException.getCause().getCause() instanceof CertPathValidatorException cpe) {
-        //        Assert.assertEquals("REVOKED", cpe.getReason().toString());
-        //        Assert.assertTrue(cpe.toString().contains("reason: KEY_COMPROMISE"));
-        //        // Some JDKs only expose CertPathValidatorException
-        //        if (cpe.getCause() instanceof CertificateRevokedException) {
-        //            throw (CertificateRevokedException) cpe.getCause();
-        //        } else {
-        //            throw new CertificateRevokedException(new Date(), CRLReason.KEY_COMPROMISE, new X500Principal(""), new HashMap<>());
-        //        }
-        //    }
-        //}
-    }
-    @Test//(expected = CertificateRevokedException.class)
-    public void testOcspRevoked_04() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_REVOKED_RESPONSE, false, false, ffm));
     }
     @Test
-    public void testOcspNoCheck() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_REVOKED_RESPONSE, false, false, ffm));
+    public void testOcsp_NoVerification() throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue(isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_REVOKED_RESPONSE)).toPath()), ocspResponderPortForClient)){
+            fakeOcspResponder.start();
+            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false, ffm));
+        }
     }
     @Test
     public void testOcspResponderUrlDiscoveryViaCertificateAIA() throws Exception {
         final int ocspPort = 8888;
         Assume.assumeTrue(isPortAvailable(ocspPort));
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, false, true, ffm,
+        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, ffm,
                 true, ocspPort));
     }
     //This test is a reference to CVE-2017-15698 of tomcat-native
@@ -368,6 +345,18 @@ public class TestOcspIntegration extends TomcatBaseTest {
             }
         }
         return trustAnchors;
+    }
+    private static void handleExceptionWhenRevoked(Exception exception) throws Exception {
+        if (exception.getCause().getCause() instanceof CertPathValidatorException cpe) {
+            Assert.assertEquals("REVOKED", cpe.getReason().toString());
+            Assert.assertTrue(cpe.toString().contains("reason: KEY_COMPROMISE"));
+            // Some JDKs only expose CertPathValidatorException
+            if (cpe.getCause() instanceof CertificateRevokedException) {
+                throw (CertificateRevokedException) cpe.getCause();
+            } else {
+                throw new CertificateRevokedException(new Date(), CRLReason.KEY_COMPROMISE, new X500Principal(""), new HashMap<>());
+            }
+        }
     }
 
     private static class FakeOcspResponder implements Closeable {
