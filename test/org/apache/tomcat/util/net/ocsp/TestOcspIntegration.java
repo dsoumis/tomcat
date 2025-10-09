@@ -119,7 +119,10 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     @Test
     public void testOcspGood_02() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, true, true, ffm));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_GOOD_RESPONSE)).toPath()), 8889)){
+            fakeOcspResponder.start();
+            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_GOOD_RESPONSE, true, true, ffm));
+        }
     }
     @Test
     public void testOcspGood_03() throws Exception {
