@@ -87,9 +87,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
-        IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv2,
-                Constants.SSL_PROTO_SSLv3, Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1,
-                Constants.SSL_PROTO_TLSv1_2, Constants.SSL_PROTO_TLSv1_3);
+        IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv3,
+                Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1, Constants.SSL_PROTO_TLSv1_2,
+                Constants.SSL_PROTO_TLSv1_3);
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
@@ -97,6 +97,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
     // 15 minutes aligns with JSSE
     private static final int OCSP_MAX_SKEW = 60 * 15;
+    private static final int OCSP_MAX_RESPONSE_SIZE = 64 * 1024;
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     private static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -739,9 +740,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if ((opts & SSL_OP_NO_TLSv1_3()) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1_3);
         }
-        if ((opts & SSL_OP_NO_SSLv2()) == 0) {
-            enabled.add(Constants.SSL_PROTO_SSLv2);
-        }
         if ((opts & SSL_OP_NO_SSLv3()) == 0) {
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
@@ -761,7 +759,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return;
         }
-        boolean sslv2 = false;
         boolean sslv3 = false;
         boolean tlsv1 = false;
         boolean tlsv1_1 = false;
@@ -772,7 +769,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
             switch (p) {
-                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
                 case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
                 case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
                 case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
@@ -782,10 +778,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         // Enable all and then disable what we not want
         openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_ALL());
-
-        if (!sslv2) {
-            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
-        }
+        // Always disable SSLv2
+        openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
         if (!sslv3) {
             openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
         }
@@ -1354,6 +1348,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             int read;
             byte[] responseBuf = new byte[1024];
             while ((read = is.read(responseBuf)) > 0) {
+                if (baos.size() > OCSP_MAX_RESPONSE_SIZE) {
+                    return V_OCSP_CERTSTATUS_UNKNOWN();
+                }
                 baos.write(responseBuf, 0, read);
             }
             byte[] responseData = baos.toByteArray();

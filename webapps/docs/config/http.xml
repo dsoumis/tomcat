@@ -651,6 +651,18 @@
       used.</p>
     </attribute>
 
+    <attribute name="noCompressionEncodings" requried="false">
+      <p>A comma-separated list of content encodings that indicate
+      already-compressed content. When the response already has a
+      <code>Content-Encoding</code> header with one of these values, compression
+      will not be applied to prevent double compression. This attribute is only
+      used if <strong>compression</strong> is set to <code>on</code> or
+      <code>force</code>.</p>
+      <p>If not specified, the default values is
+      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      includes all commonly used compression algorithms.</p>
+    </attribute>
+
     <attribute name="noCompressionUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which
@@ -1399,8 +1411,7 @@
       based secure connector it will always support <code>SSLv2Hello</code>. If a
       single protocol is specified it will not support
       <code>SSLv2Hello</code>.</p>
-      <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
-      unsafe.</p>
+      <p>Note that <code>SSLv3</code> is inherently unsafe.</p>
       <p>If not specified, the default value of <code>all</code> will be
       used.</p>
     </attribute>
